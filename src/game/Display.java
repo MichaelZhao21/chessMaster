@@ -1,11 +1,17 @@
 package game;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Display extends JPanel {
 
     private final int SQUARE = 60;
+    private final String PIECE_DIRECTORY = "resources/pieces/letters";
+    private Game game = new Game();
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -40,7 +46,39 @@ public class Display extends JPanel {
     }
 
     private void drawPieces(Graphics2D g) {
+        for (int i = 0; i < game.pieces.size(); i++) {
+            Piece tempPiece = game.pieces.get(i);
+            String letter = tempPiece.black ? "B" : "W";
+            letter += pieceTypeToLetter(tempPiece.type);
 
+            BufferedImage img;
+            try {
+                img = ImageIO.read(new File(PIECE_DIRECTORY + "/" + letter + ".png"));
+                g.drawImage(img,
+                        Function.charLetterToInt(tempPiece.cell.col) * SQUARE,
+                        tempPiece.cell.row * SQUARE,
+                        null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private String pieceTypeToLetter(PieceType type) {
+        switch (type) {
+            case KING:
+                return "K";
+            case QUEEN:
+                return "Q";
+            case BISHOP:
+                return "B";
+            case KNIGHT:
+                return "N";
+            case ROOK:
+                return "R";
+        }
+        return "P";
     }
 
     private void drawLetters(Graphics2D g) {
@@ -49,7 +87,7 @@ public class Display extends JPanel {
         g.setFont(new Font("Serif", Font.PLAIN, 25));
         FontMetrics fm = g.getFontMetrics();
         for (int i = 0; i < 8; i++) {
-            String text = getCharForNumber(8 - i);
+            String text = Function.getStringCharForNumber(8 - i);
             int xOffset = -(fm.stringWidth(text) / 2);
             int yOffset = fm.getAscent() - (fm.getHeight() / 2);
             g.drawString(text, (90 + (SQUARE * (7 - i))) + xOffset, 45 + yOffset);
@@ -57,12 +95,9 @@ public class Display extends JPanel {
         }
     }
 
-    private String getCharForNumber(int i) {
-        return String.valueOf((char)(i + 96));
-    }
-
     private void createFrame() {
         JFrame f = new JFrame();
+        this.addMouseListener(game);
         f.add(this);
         f.getContentPane().setPreferredSize(new Dimension(1100, 600));
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
