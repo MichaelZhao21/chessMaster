@@ -13,4 +13,12 @@ public class Cell {
     public boolean compare(Cell compCell) {
         return (this.col == compCell.col && this.row == compCell.row);
     }
+
+    public int getX() {
+        return Function.charLetterToInt(col) * 60;
+    }
+
+    public int getY() {
+        return (9 - row) * 60;
+    }
 }

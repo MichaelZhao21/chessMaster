@@ -3,6 +3,7 @@ package game;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +12,7 @@ public class Display extends JPanel {
 
     private final int SQUARE = 60;
     private final String PIECE_DIRECTORY = "resources/pieces/letters";
-    private Game game = new Game();
+    private Game game = new Game(this);
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -21,7 +22,7 @@ public class Display extends JPanel {
         drawBoard(g2);
         drawLetters(g2);
         drawPieces(g2);
-
+        if (game.highlighted) drawHighlights(g2);
     }
 
     private void drawBoard(Graphics2D g) {
@@ -48,7 +49,7 @@ public class Display extends JPanel {
     private void drawPieces(Graphics2D g) {
         for (int i = 0; i < game.pieces.size(); i++) {
             Piece tempPiece = game.pieces.get(i);
-            String letter = tempPiece.black ? "B" : "W";
+            String letter = tempPiece.white ? "W" : "B";
             letter += pieceTypeToLetter(tempPiece.type);
 
             BufferedImage img;
@@ -56,13 +57,43 @@ public class Display extends JPanel {
                 img = ImageIO.read(new File(PIECE_DIRECTORY + "/" + letter + ".png"));
                 g.drawImage(img,
                         Function.charLetterToInt(tempPiece.cell.col) * SQUARE,
-                        tempPiece.cell.row * SQUARE,
+                        (9 - tempPiece.cell.row) * SQUARE,
                         null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
+    }
+
+    private void drawHighlights(Graphics2D g) {
+        Piece clickedPiece = game.highlightedPiece;
+        int x = clickedPiece.cell.getX();
+        int y = clickedPiece.cell.getY();
+        drawSingleGradient(g, true, x, y);
+        for (Cell cell : game.possibleMoves) {
+            drawSingleGradient(g, false, cell.getX(), cell.getY());
+        }
+    }
+
+    private void drawSingleGradient(Graphics2D g, boolean green, int x, int y) {
+        Point2D top = new Point2D.Float(30 + x, y);
+        Point2D left = new Point2D.Float(x, 30 + y);
+        Point2D right = new Point2D.Float(60 + x, 30 + y);
+        Point2D bottom = new Point2D.Float(30 + x, 60 + y);
+
+        paintGradientLayer(g, green, x, y, top, new Point2D.Float(30 + x, 30 + y - 20));
+        paintGradientLayer(g, green, x, y, left, new Point2D.Float(30 + x - 20, 30 + y));
+        paintGradientLayer(g, green, x, y, right, new Point2D.Float(30 + x + 20, 30 + y));
+        paintGradientLayer(g, green, x, y, bottom, new Point2D.Float(30 + x, 30 + y + 20));
+    }
+
+    private void paintGradientLayer(Graphics2D g, boolean green, int x, int y, Point2D start, Point2D end) {
+        Color color = green ? new Color(150, 255, 159, 200) : new Color(250, 245, 160, 200);
+        GradientPaint gradientPaint = new GradientPaint(
+                start, color, end, new Color(255, 255, 255, 0));
+        g.setPaint(gradientPaint);
+        g.fillRect(x, y, 60, 60);
     }
 
     private String pieceTypeToLetter(PieceType type) {

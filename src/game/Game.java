@@ -7,11 +7,16 @@ import java.util.ArrayList;
 public class Game implements MouseListener {
 
     private final int SQUARE = 60;
-    private boolean blackTurn = false;
+    private boolean whiteTurn = true;
+    private Display display;
+    boolean highlighted = false;
+    Piece highlightedPiece;
+    ArrayList<Cell> possibleMoves = new ArrayList<>();
     ArrayList<Piece> pieces = new ArrayList<>();
 
-    public Game() {
+    public Game(Display display) {
         makePieces();
+        this.display = display;
     }
 
     private void makePieces() {
@@ -38,7 +43,7 @@ public class Game implements MouseListener {
         }
     }
 
-    private void run(MouseEvent e) {
+    private void pickPiece(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
         if (x < SQUARE || x > SQUARE * 9 || y < SQUARE || y > SQUARE * 9) return;
@@ -46,12 +51,10 @@ public class Game implements MouseListener {
         Cell c = getCellClicked(x, y);
         Piece clicked = getClickedPiece(c);
         if (clicked != null) {
-            if (blackTurn == clicked.black) {
-                System.out.println("uwu");
+            if (whiteTurn == clicked.white) {
+                highlight(clicked);
             }
         }
-
-        System.out.println(Character.toString(c.col) + c.row);
     }
 
     private Cell getCellClicked(int x, int y) {
@@ -67,9 +70,46 @@ public class Game implements MouseListener {
         return null;
     }
 
+    private void highlight(Piece piece) {
+
+        possibleMoves.clear();
+        getPossibleMoves(piece);
+
+        highlightedPiece = piece;
+        highlighted = true;
+        display.repaint();
+    }
+
+    private void getPossibleMoves(Piece piece) {
+        switch (piece.type) {
+            case PAWN:
+
+                break;
+            case KING:
+                break;
+            case QUEEN:
+                break;
+            case BISHOP:
+                break;
+            case KNIGHT:
+                break;
+            case ROOK:
+                break;
+        }
+    }
+
+    private void movePiece(MouseEvent e) {
+        pickPiece(e);
+    }
+
     @Override
     public void mouseClicked(MouseEvent e) {
-        run(e);
+        if (highlighted) {
+            movePiece(e);
+        }
+        else {
+            pickPiece(e);
+        }
     }
 
     @Override
