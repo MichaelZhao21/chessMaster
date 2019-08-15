@@ -5,6 +5,11 @@ public class Cell {
     public char col;
     public int row;
 
+    public Cell() {
+        this.col = 'j';
+        this.row = 0;
+    }
+
     public Cell(char col, int row) {
         this.col = col;
         this.row = row;
@@ -20,5 +25,9 @@ public class Cell {
 
     public int getY() {
         return (9 - row) * 60;
+    }
+
+    public char getAddedColChar(int change) {
+        return Function.getCharForNumber(Function.charLetterToInt(col) + change);
     }
 }

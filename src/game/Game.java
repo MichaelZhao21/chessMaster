@@ -72,31 +72,128 @@ public class Game implements MouseListener {
 
     private void highlight(Piece piece) {
 
-        possibleMoves.clear();
-        getPossibleMoves(piece);
-
+        possibleMoves = getPossibleMoves(piece);
         highlightedPiece = piece;
         highlighted = true;
         display.repaint();
     }
 
-    private void getPossibleMoves(Piece piece) {
-        switch (piece.type) {
-            case PAWN:
+    private ArrayList<Cell> getPossibleMoves(Piece piece) {
+        ArrayList<Cell> output = getUncheckedMoves(piece);
+        return output;
+    }
 
-                break;
+    private ArrayList<Cell> getUncheckedMoves(Piece piece) {
+        switch (piece.type) {
             case KING:
-                break;
+                return getKingMoves(piece);
             case QUEEN:
-                break;
             case BISHOP:
-                break;
             case KNIGHT:
-                break;
             case ROOK:
-                break;
+            case PAWN:
+                return getPawnMoves(piece);
+        }
+        return new ArrayList<>();
+    }
+
+    private boolean captureCheck(Cell enemyCell, Piece attackPiece) {
+        Piece piece = getOverlapPiece(enemyCell);
+        return (piece.type != PieceType.NONE &&
+                piece.type != PieceType.EMPTY &&
+                piece.white != attackPiece.white);
+    }
+
+    private boolean checkEmpty(Cell cell) {
+        return (getOverlapPiece(cell).type == PieceType.EMPTY);
+    }
+
+    private Piece getOverlapPiece(Cell cell) {
+        for (Piece piece : pieces) {
+            if (cell.compare(piece.cell)) return piece;
+        }
+        if (cell.row < 1 ||
+                cell.row > 8 ||
+                Function.charLetterToInt(cell.col) < 1 ||
+                Function.charLetterToInt(cell.col) > 8) {
+            return new Piece(PieceType.NONE);
+        } else {
+            return new Piece(PieceType.EMPTY);
         }
     }
+
+    private ArrayList<Cell> getKingMoves(Piece piece) {
+        ArrayList<Cell> output = new ArrayList<>();
+        for (int row = -1; row <= 1; row++) {
+            for (int col = -1; col <= 1; col++) {
+                if (!(row == 0 && col == 0)) {
+                    Cell newCell = new Cell(piece.cell.getAddedColChar(col), piece.cell.row + row);
+                    if (getOverlapPiece(newCell).type == PieceType.EMPTY ||
+                            captureCheck(newCell, piece)) output.add(newCell);
+                }
+            }
+        }
+        return output;
+    }
+
+    private ArrayList<Cell> getPawnMoves(Piece piece) {
+        ArrayList<Cell> output = new ArrayList<>();
+
+        // Move 1 space
+        Cell oneMove = new Cell(piece.cell.col, piece.cell.row + (piece.white ? 1 : -1));
+        if (checkEmpty(oneMove)) output.add(oneMove);
+
+        // Move 2 spaces
+        if (output.size() > 0) {
+            if ((piece.white && piece.cell.row == 2) ||
+                    (!piece.white && piece.cell.row == 7)) {
+                Cell twoMove = new Cell(piece.cell.col, piece.cell.row + (piece.white ? 2 : -2));
+                if (checkEmpty(twoMove)) output.add(twoMove);
+            }
+        }
+
+        // Capture
+        Cell captureLeft = new Cell(piece.cell.getAddedColChar(piece.white ? 1 : -1),
+                piece.cell.row + (piece.white ? 1 : -1));
+        Cell captureRight = new Cell(piece.cell.getAddedColChar(piece.white ? -1 : 1),
+                piece.cell.row + (piece.white ? 1 : -1));
+        if (captureCheck(captureLeft, piece)) output.add(captureLeft);
+        if (captureCheck(captureRight, piece)) output.add(captureRight);
+        // TODO: Add en passant rules (get the previous move)
+        return output;
+    }
+
+//
+//    private boolean checkCheck(Piece piece, Cell newLocation) {
+//        Cell oldLocation = piece.cell;
+//        piece.cell = newLocation;
+//        boolean check = checkCheck(piece.white);
+//        piece.cell = oldLocation;
+//        return check;
+//    }
+//
+//    private boolean checkCheck(boolean white) {
+//        Cell kingCell = null;
+//        for (Piece piece : pieces) {
+//            if (piece.type == PieceType.KING && piece.white == white) kingCell = piece.cell;
+//        }
+//        if (kingCell != null) {
+//            for (Piece piece : pieces) {
+//                if (piece.white == white) {
+//                    if (testForCheckMoves(kingCell, piece)) return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private boolean testForCheckMoves(Cell kingCell, Piece movePiece) {
+//        ArrayList<Cell> moves = getPossibleMoves(movePiece);
+//        for (Cell c : moves) {
+//            if (c.compare(kingCell)) return true;
+//        }
+//        return false;
+//    }
 
     private void movePiece(MouseEvent e) {
         pickPiece(e);

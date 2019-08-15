@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ef5f3c9d-1d5b-4509-8e0a-b66b0842a214" name="Default Changelist" comment="">
+    <list default="true" id="ef5f3c9d-1d5b-4509-8e0a-b66b0842a214" name="Default Changelist" comment="Added piece selection highlight">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/chessMaster/game/Display.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/chessMaster/game/Display.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Cell.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Cell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/Display.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Display.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/game/Piece.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/Piece.java" afterDir="false" />
     </list>
@@ -21,13 +19,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/game/Display.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="73" column="46" lean-forward="true" selection-start-line="73" selection-start-column="46" selection-end-line="73" selection-end-column="46" />
+            <state relative-caret-position="199">
+              <caret line="73" column="34" selection-start-line="73" selection-start-column="34" selection-end-line="73" selection-end-column="34" />
               <folding>
                 <marker date="1565810880077" expanded="true" signature="1590:2001" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/game/Game.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="520">
+              <caret line="22" column="66" selection-start-line="22" selection-start-column="66" selection-end-line="22" selection-end-column="66" />
+              <folding>
+                <element signature="e#3825#3826#0" expanded="true" />
+                <element signature="e#7154#7155#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -51,22 +62,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/game/Game.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="86" column="22" lean-forward="true" selection-start-line="86" selection-start-column="22" selection-end-line="86" selection-end-column="22" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/game/Piece.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+            <state relative-caret-position="270">
+              <caret line="10" column="16" lean-forward="true" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -74,8 +73,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/game/Cell.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="21" column="25" selection-start-line="21" selection-start-column="25" selection-end-line="21" selection-end-column="25" />
+            <state relative-caret-position="243">
+              <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
               <folding>
                 <element signature="e#225#226#0" expanded="true" />
                 <element signature="e#290#291#0" expanded="true" />
@@ -108,6 +107,9 @@
       <find>Sys</find>
       <find>true</find>
       <find>false</find>
+      <find>possibleMoves</find>
+      <find>!checkOverlap</find>
+      <find>syste</find>
     </findStrings>
     <replaceStrings>
       <replace>1</replace>
@@ -115,6 +117,8 @@
       <replace>20</replace>
       <replace>false</replace>
       <replace>true</replace>
+      <replace>output</replace>
+      <replace>checkOverlap</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -125,10 +129,10 @@
       <list>
         <option value="$PROJECT_DIR$/src/game/Pieces.java" />
         <option value="$PROJECT_DIR$/src/game/Function.java" />
+        <option value="$PROJECT_DIR$/src/game/Display.java" />
         <option value="$PROJECT_DIR$/src/game/Cell.java" />
         <option value="$PROJECT_DIR$/src/game/Piece.java" />
         <option value="$PROJECT_DIR$/src/game/Game.java" />
-        <option value="$PROJECT_DIR$/src/game/Display.java" />
       </list>
     </option>
   </component>
@@ -226,7 +230,7 @@
       <option name="presentableId" value="Default" />
       <updated>1565730530308</updated>
       <workItem from="1565730559867" duration="10996000" />
-      <workItem from="1565755015947" duration="26078000" />
+      <workItem from="1565755015947" duration="47113000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1565776887732</created>
@@ -242,17 +246,24 @@
       <option name="project" value="LOCAL" />
       <updated>1565806016833</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added piece selection highlight">
+      <created>1565810928348</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1565810928348</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="37074000" />
+    <option name="totallyTimeSpent" value="58109000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="56" y="-6" width="1871" height="1093" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16381688" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16381688" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -261,7 +272,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32917964" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32917964" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32917964" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -289,7 +300,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
     <MESSAGE value="Added pieces and MouseListener" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added pieces and MouseListener" />
+    <MESSAGE value="Added piece selection highlight" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added piece selection highlight" />
   </component>
   <component name="editorHistoryManager">
     <entry file="jar://C:/Program Files/Java/jdk-12.0.1/lib/src.zip!/java.desktop/javax/swing/JComponent.java">
@@ -334,25 +346,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/game/Cell.java">
+    <entry file="file://$PROJECT_DIR$/out/production/chessMaster/game/Cell.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="21" column="25" selection-start-line="21" selection-start-column="25" selection-end-line="21" selection-end-column="25" />
+        <state>
           <folding>
-            <element signature="e#225#226#0" expanded="true" />
-            <element signature="e#290#291#0" expanded="true" />
-            <element signature="e#318#319#0" expanded="true" />
-            <element signature="e#374#375#0" expanded="true" />
-            <element signature="e#396#397#0" expanded="true" />
-            <element signature="e#432#433#0" expanded="true" />
+            <element signature="e#0#550#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/game/Piece.java">
+    <entry file="file://$PROJECT_DIR$/src/game/Display.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+        <state relative-caret-position="199">
+          <caret line="73" column="34" selection-start-line="73" selection-start-column="34" selection-end-line="73" selection-end-column="34" />
+          <folding>
+            <marker date="1565810880077" expanded="true" signature="1590:2001" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -371,31 +380,35 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/out/production/chessMaster/game/Cell.class">
+    <entry file="file://$PROJECT_DIR$/src/game/Cell.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="243">
+          <caret line="9" column="21" selection-start-line="9" selection-start-column="21" selection-end-line="9" selection-end-column="21" />
           <folding>
-            <element signature="e#0#550#0" expanded="true" />
+            <element signature="e#225#226#0" expanded="true" />
+            <element signature="e#290#291#0" expanded="true" />
+            <element signature="e#318#319#0" expanded="true" />
+            <element signature="e#374#375#0" expanded="true" />
+            <element signature="e#396#397#0" expanded="true" />
+            <element signature="e#432#433#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/game/Piece.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="10" column="16" lean-forward="true" selection-start-line="10" selection-start-column="16" selection-end-line="10" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/game/Game.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="86" column="22" lean-forward="true" selection-start-line="86" selection-start-column="22" selection-end-line="86" selection-end-column="22" />
+        <state relative-caret-position="520">
+          <caret line="22" column="66" selection-start-line="22" selection-start-column="66" selection-end-line="22" selection-end-column="66" />
           <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/game/Display.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="73" column="46" lean-forward="true" selection-start-line="73" selection-start-column="46" selection-end-line="73" selection-end-column="46" />
-          <folding>
-            <marker date="1565810880077" expanded="true" signature="1590:2001" ph="..." />
+            <element signature="e#3825#3826#0" expanded="true" />
+            <element signature="e#7154#7155#0" expanded="true" />
           </folding>
         </state>
       </provider>
