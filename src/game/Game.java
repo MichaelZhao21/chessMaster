@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class Game implements MouseListener {
 
     private final int SQUARE = 60;
+    private final int[][] UNIT_DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     private boolean whiteTurn = true;
     private Display display;
     boolean highlighted = false;
@@ -71,7 +72,6 @@ public class Game implements MouseListener {
     }
 
     private void highlight(Piece piece) {
-
         possibleMoves = getPossibleMoves(piece);
         highlightedPiece = piece;
         highlighted = true;
@@ -92,6 +92,7 @@ public class Game implements MouseListener {
             case BISHOP:
                 return getBishopMoves(piece);
             case KNIGHT:
+                return getKnightMoves(piece);
             case ROOK:
                 return getRookMoves(piece);
             case PAWN:
@@ -153,8 +154,30 @@ public class Game implements MouseListener {
     }
 
     private ArrayList<Cell> getRookMoves(Piece piece) {
-        int[][] moveList = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-        return testMovesFromMoveList(moveList, piece);
+        return testMovesFromMoveList(UNIT_DIRECTIONS, piece);
+    }
+
+    private ArrayList<Cell> getKnightMoves(Piece piece) {
+        ArrayList<Cell> output = new ArrayList<>();
+        Cell moveA;
+        Cell moveB;
+        for (int[] moveSet : UNIT_DIRECTIONS) {
+            if (moveSet[0] != 0) {
+                moveA = new Cell(piece.cell.getAddedColChar(2 * moveSet[0]),
+                        piece.cell.row + 1);
+                moveB = new Cell(piece.cell.getAddedColChar(2 * moveSet[0]),
+                        piece.cell.row - 1);
+            }
+            else {
+                moveA = new Cell(piece.cell.getAddedColChar(1),
+                        piece.cell.row + (2 * moveSet[1]));
+                moveB = new Cell(piece.cell.getAddedColChar(-1),
+                        piece.cell.row + (2 * moveSet[1]));
+            }
+            if (captureCheck(moveA, piece) || checkEmpty(moveA)) output.add(moveA);
+            if (captureCheck(moveB, piece) || checkEmpty(moveB)) output.add(moveB);
+        }
+        return output;
     }
 
     private ArrayList<Cell> testMovesFromMoveList(int[][] moveList, Piece piece) {
@@ -209,38 +232,6 @@ public class Game implements MouseListener {
             return new Piece(PieceType.EMPTY);
         }
     }
-
-//
-//    private boolean checkCheck(Piece piece, Cell newLocation) {
-//        Cell oldLocation = piece.cell;
-//        piece.cell = newLocation;
-//        boolean check = checkCheck(piece.white);
-//        piece.cell = oldLocation;
-//        return check;
-//    }
-//
-//    private boolean checkCheck(boolean white) {
-//        Cell kingCell = null;
-//        for (Piece piece : pieces) {
-//            if (piece.type == PieceType.KING && piece.white == white) kingCell = piece.cell;
-//        }
-//        if (kingCell != null) {
-//            for (Piece piece : pieces) {
-//                if (piece.white == white) {
-//                    if (testForCheckMoves(kingCell, piece)) return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean testForCheckMoves(Cell kingCell, Piece movePiece) {
-//        ArrayList<Cell> moves = getPossibleMoves(movePiece);
-//        for (Cell c : moves) {
-//            if (c.compare(kingCell)) return true;
-//        }
-//        return false;
-//    }
 
     private void movePiece(MouseEvent e) {
         pickPiece(e);
