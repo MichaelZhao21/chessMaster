@@ -88,38 +88,16 @@ public class Game implements MouseListener {
             case KING:
                 return getKingMoves(piece);
             case QUEEN:
+                return getQueenMoves(piece);
             case BISHOP:
+                return getBishopMoves(piece);
             case KNIGHT:
             case ROOK:
+                return getRookMoves(piece);
             case PAWN:
                 return getPawnMoves(piece);
         }
         return new ArrayList<>();
-    }
-
-    private boolean captureCheck(Cell enemyCell, Piece attackPiece) {
-        Piece piece = getOverlapPiece(enemyCell);
-        return (piece.type != PieceType.NONE &&
-                piece.type != PieceType.EMPTY &&
-                piece.white != attackPiece.white);
-    }
-
-    private boolean checkEmpty(Cell cell) {
-        return (getOverlapPiece(cell).type == PieceType.EMPTY);
-    }
-
-    private Piece getOverlapPiece(Cell cell) {
-        for (Piece piece : pieces) {
-            if (cell.compare(piece.cell)) return piece;
-        }
-        if (cell.row < 1 ||
-                cell.row > 8 ||
-                Function.charLetterToInt(cell.col) < 1 ||
-                Function.charLetterToInt(cell.col) > 8) {
-            return new Piece(PieceType.NONE);
-        } else {
-            return new Piece(PieceType.EMPTY);
-        }
     }
 
     private ArrayList<Cell> getKingMoves(Piece piece) {
@@ -159,8 +137,77 @@ public class Game implements MouseListener {
                 piece.cell.row + (piece.white ? 1 : -1));
         if (captureCheck(captureLeft, piece)) output.add(captureLeft);
         if (captureCheck(captureRight, piece)) output.add(captureRight);
-        // TODO: Add en passant rules (get the previous move)
+        // TODO: Add En passant rules (get the previous move)
         return output;
+    }
+
+    private ArrayList<Cell> getQueenMoves(Piece piece) {
+        ArrayList<Cell> output = getBishopMoves(piece);
+        output.addAll(getRookMoves(piece));
+        return output;
+    }
+
+    private ArrayList<Cell> getBishopMoves(Piece piece) {
+        int[][] moveList = {{1,1}, {-1, -1}, {-1, 1}, {1, -1}};
+        return testMovesFromMoveList(moveList, piece);
+    }
+
+    private ArrayList<Cell> getRookMoves(Piece piece) {
+        int[][] moveList = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        return testMovesFromMoveList(moveList, piece);
+    }
+
+    private ArrayList<Cell> testMovesFromMoveList(int[][] moveList, Piece piece) {
+        boolean nextEmpty;
+        int incr;
+        Cell nextCell;
+        ArrayList<Cell> output = new ArrayList<>();
+
+        for (int[] moveSet : moveList) {
+            nextEmpty = true;
+            incr = 0;
+            while (nextEmpty) {
+                incr++;
+                nextCell = new Cell(piece.cell.getAddedColChar(incr * moveSet[0]),
+                        piece.cell.row + (incr * moveSet[1]));
+                if (captureCheck(nextCell, piece)) {
+                    output.add(nextCell);
+                    nextEmpty = false;
+                }
+                else if (checkEmpty(nextCell)) {
+                    output.add(nextCell);
+                }
+                else {
+                    nextEmpty = false;
+                }
+            }
+        }
+        return output;
+    }
+
+    private boolean captureCheck(Cell enemyCell, Piece attackPiece) {
+        Piece piece = getOverlapPiece(enemyCell);
+        return (piece.type != PieceType.NONE &&
+                piece.type != PieceType.EMPTY &&
+                piece.white != attackPiece.white);
+    }
+
+    private boolean checkEmpty(Cell cell) {
+        return (getOverlapPiece(cell).type == PieceType.EMPTY);
+    }
+
+    private Piece getOverlapPiece(Cell cell) {
+        for (Piece piece : pieces) {
+            if (cell.compare(piece.cell)) return piece;
+        }
+        if (cell.row < 1 ||
+                cell.row > 8 ||
+                Function.charLetterToInt(cell.col) < 1 ||
+                Function.charLetterToInt(cell.col) > 8) {
+            return new Piece(PieceType.NONE);
+        } else {
+            return new Piece(PieceType.EMPTY);
+        }
     }
 
 //
