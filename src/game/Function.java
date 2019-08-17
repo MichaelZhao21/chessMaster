@@ -14,4 +14,20 @@ public class Function {
         return Character.getNumericValue(c) - 9;
     }
 
+    public static String pieceTypeToLetter(PieceType type) {
+        switch (type) {
+            case KING:
+                return "K";
+            case QUEEN:
+                return "Q";
+            case BISHOP:
+                return "B";
+            case KNIGHT:
+                return "N";
+            case ROOK:
+                return "R";
+        }
+        return "P";
+    }
+
 }

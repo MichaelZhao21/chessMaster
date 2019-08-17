@@ -50,8 +50,7 @@ public class Display extends JPanel {
         for (int i = 0; i < game.pieces.size(); i++) {
             Piece tempPiece = game.pieces.get(i);
             String letter = tempPiece.white ? "W" : "B";
-            letter += pieceTypeToLetter(tempPiece.type);
-
+            letter += Function.pieceTypeToLetter(tempPiece.type);
             BufferedImage img;
             try {
                 img = ImageIO.read(new File(PIECE_DIRECTORY + "/" + letter + ".png"));
@@ -82,34 +81,19 @@ public class Display extends JPanel {
         Point2D right = new Point2D.Float(60 + x, 30 + y);
         Point2D bottom = new Point2D.Float(30 + x, 60 + y);
 
-        paintGradientLayer(g, green, x, y, top, new Point2D.Float(30 + x, 30 + y - 20));
-        paintGradientLayer(g, green, x, y, left, new Point2D.Float(30 + x - 20, 30 + y));
-        paintGradientLayer(g, green, x, y, right, new Point2D.Float(30 + x + 20, 30 + y));
-        paintGradientLayer(g, green, x, y, bottom, new Point2D.Float(30 + x, 30 + y + 20));
+        final int GRAD_OFFSET = 15;
+        paintGradientLayer(g, green, x, y, top, new Point2D.Float(30 + x, 30 + y - GRAD_OFFSET));
+        paintGradientLayer(g, green, x, y, left, new Point2D.Float(30 + x - GRAD_OFFSET, 30 + y));
+        paintGradientLayer(g, green, x, y, right, new Point2D.Float(30 + x + GRAD_OFFSET, 30 + y));
+        paintGradientLayer(g, green, x, y, bottom, new Point2D.Float(30 + x, 30 + y + GRAD_OFFSET));
     }
 
     private void paintGradientLayer(Graphics2D g, boolean green, int x, int y, Point2D start, Point2D end) {
-        Color color = green ? new Color(150, 255, 159, 200) : new Color(250, 245, 160, 200);
+        Color color = green ? new Color(150, 255, 159, 200) : new Color(133, 248, 250, 200);
         GradientPaint gradientPaint = new GradientPaint(
                 start, color, end, new Color(255, 255, 255, 0));
         g.setPaint(gradientPaint);
         g.fillRect(x, y, 60, 60);
-    }
-
-    private String pieceTypeToLetter(PieceType type) {
-        switch (type) {
-            case KING:
-                return "K";
-            case QUEEN:
-                return "Q";
-            case BISHOP:
-                return "B";
-            case KNIGHT:
-                return "N";
-            case ROOK:
-                return "R";
-        }
-        return "P";
     }
 
     private void drawLetters(Graphics2D g) {

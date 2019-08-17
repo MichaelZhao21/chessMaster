@@ -20,4 +20,9 @@ public class Piece {
         this.cell = new Cell();
     }
 
+    public void print() {
+        System.out.println(String.format(
+                "PIECE | %s %s -> %c%d", (white ? "White" : "Black"), type, cell.col, cell.row));
+    }
+
 }

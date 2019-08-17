@@ -30,4 +30,8 @@ public class Cell {
     public char getAddedColChar(int change) {
         return Function.getCharForNumber(Function.charLetterToInt(col) + change);
     }
+
+    public void print() {
+        System.out.println(Character.toString(col) + row);
+    }
 }

@@ -4,16 +4,21 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
+enum NotationException {NONE, CAPTURE, EN_PASSANT, CHECKMATE, DRAW}
+
 public class Game implements MouseListener {
 
     private final int SQUARE = 60;
     private final int[][] UNIT_DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     private boolean whiteTurn = true;
     private Display display;
-    boolean highlighted = false;
-    Piece highlightedPiece;
     ArrayList<Cell> possibleMoves = new ArrayList<>();
     ArrayList<Piece> pieces = new ArrayList<>();
+    ArrayList<String> score = new ArrayList<>();
+    boolean highlighted = false;
+    Piece highlightedPiece;
+    Piece enPassantPos = new Piece(PieceType.NONE);
+    int turn = 0;
 
     public Game(Display display) {
         makePieces();
@@ -21,16 +26,22 @@ public class Game implements MouseListener {
     }
 
     private void makePieces() {
-        pieces.add(new Piece(PieceType.KING, true, new Cell('d', 1)));
-        pieces.add(new Piece(PieceType.QUEEN, true, new Cell('e', 1)));
+//        pieces.add(new Piece(PieceType.KING, true, new Cell('e', 1)));
+//        pieces.add(new Piece(PieceType.PAWN, true, new Cell('d', 1)));
+//        pieces.add(new Piece(PieceType.PAWN, true, new Cell('d', 2)));
+//        pieces.add(new Piece(PieceType.PAWN, true, new Cell('f', 1)));
+//        pieces.add(new Piece(PieceType.PAWN, true, new Cell('f', 2)));
+//        pieces.add(new Piece(PieceType.QUEEN, false, new Cell('a', 4)));
+        pieces.add(new Piece(PieceType.KING, true, new Cell('e', 1)));
+        pieces.add(new Piece(PieceType.QUEEN, true, new Cell('d', 1)));
         pieces.add(new Piece(PieceType.BISHOP, true, new Cell('c', 1)));
         pieces.add(new Piece(PieceType.BISHOP, true, new Cell('f', 1)));
         pieces.add(new Piece(PieceType.KNIGHT, true, new Cell('b', 1)));
         pieces.add(new Piece(PieceType.KNIGHT, true, new Cell('g', 1)));
         pieces.add(new Piece(PieceType.ROOK, true, new Cell('a', 1)));
         pieces.add(new Piece(PieceType.ROOK, true, new Cell('h', 1)));
-        pieces.add(new Piece(PieceType.KING, false, new Cell('d', 8)));
-        pieces.add(new Piece(PieceType.QUEEN, false, new Cell('e', 8)));
+        pieces.add(new Piece(PieceType.KING, false, new Cell('e', 8)));
+        pieces.add(new Piece(PieceType.QUEEN, false, new Cell('d', 8)));
         pieces.add(new Piece(PieceType.BISHOP, false, new Cell('c', 8)));
         pieces.add(new Piece(PieceType.BISHOP, false, new Cell('f', 8)));
         pieces.add(new Piece(PieceType.KNIGHT, false, new Cell('b', 8)));
@@ -71,6 +82,54 @@ public class Game implements MouseListener {
         return null;
     }
 
+    private void movePiece(MouseEvent e) {
+        boolean moved = false;
+        int x = e.getX();
+        int y = e.getY();
+        Cell clickedCell = getCellClicked(x, y);
+        for (Cell nextMove : possibleMoves) {
+            if (clickedCell.compare(nextMove)) {
+                Piece p = getOverlapPiece(clickedCell);
+                if (p.type != PieceType.EMPTY) {
+                    pieces.remove(p);
+                    notate(highlightedPiece, clickedCell, NotationException.CAPTURE, p);
+                }
+                else {
+                    notate(highlightedPiece, clickedCell, NotationException.NONE, new Piece(PieceType.NONE));
+                }
+                highlightedPiece.cell = clickedCell;
+                moved = true;
+                whiteTurn = !whiteTurn;
+            }
+        }
+        highlighted = false;
+        if (!moved) pickPiece(e);
+        Piece checkPiece = checkMateCheck();
+        if (checkPiece.type != PieceType.NONE) endGame(NotationException.CHECKMATE, checkPiece);
+        else if (drawCheck()) endGame(NotationException.DRAW, new Piece(PieceType.NONE));
+        display.repaint();
+    }
+
+    private void endGame(NotationException e, Piece extra) {
+        if (e == NotationException.CHECKMATE) {
+            System.out.println((extra.white ? "black" : "white") + " wins!");
+        }
+    }
+
+    private void notate(Piece piece, Cell moveTo, NotationException exception, Piece args) {
+        String pieceLetter = Function.pieceTypeToLetter(piece.type);
+        String moveString = Character.toString(moveTo.col) + moveTo.row;
+        String note = "";
+        if (exception == NotationException.NONE)
+            note = (pieceLetter.equals("P") ? "" : pieceLetter) + moveString;
+        addToScore(note);
+    }
+
+    private void addToScore(String nextNote) {
+        if (whiteTurn) score.add(++turn + ". ");
+        score.add(nextNote);
+    }
+
     private void highlight(Piece piece) {
         possibleMoves = getPossibleMoves(piece);
         highlightedPiece = piece;
@@ -80,6 +139,13 @@ public class Game implements MouseListener {
 
     private ArrayList<Cell> getPossibleMoves(Piece piece) {
         ArrayList<Cell> output = getUncheckedMoves(piece);
+        ArrayList<Cell> bad = new ArrayList<>();
+        for (Cell c : output) {
+            if (checkCheck(piece, c)) bad.add(c);
+        }
+        for (Cell c : bad) {
+            output.remove(c);
+        }
         return output;
     }
 
@@ -233,8 +299,61 @@ public class Game implements MouseListener {
         }
     }
 
-    private void movePiece(MouseEvent e) {
-        pickPiece(e);
+    // TODO: Right now eating doesnt count as leaving check >:(
+    private boolean checkCheck(Piece piece, Cell newLocation) {
+        Cell oldLocation = piece.cell;
+        Piece eatenPiece = getOverlapPiece(newLocation);
+        if (eatenPiece.type != PieceType.EMPTY) pieces.remove(eatenPiece);
+        piece.cell = newLocation;
+        boolean check = checkCheck(piece.white);
+        if (eatenPiece.type != PieceType.EMPTY) pieces.add(eatenPiece);
+        piece.cell = oldLocation;
+        return check;
+    }
+
+    private boolean checkCheck(boolean white) {
+        Cell kingCell = getKing(white).cell;
+        if (kingCell != null) {
+            for (Piece piece : pieces) {
+                if (piece.white != white) {
+                    if (individualCheck(piece, kingCell)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //TODO FIXXXXXXX >:(
+    private Piece checkMateCheck() {
+        Piece king = getKing(!whiteTurn);
+        if (checkCheck(!whiteTurn)) {
+            ArrayList<Cell> possibleKingMoves = getPossibleMoves(king);
+            for (Cell c : possibleKingMoves) {
+                if (!checkCheck(king, c)) return new Piece(PieceType.NONE);
+            }
+        }
+        return king;
+    }
+
+    private Piece getKing(boolean white) {
+        for (Piece piece : pieces) {
+            if (piece.type == PieceType.KING && piece.white == white) return piece;
+        }
+        return new Piece(PieceType.NONE);
+    }
+
+    private boolean drawCheck() {
+        // TODO DRAW CHECK - Stalemate,
+        //  & insuff check material:KvK, KvB/K, KvK/K, K/BvK/B (B same color)
+        return false;
+    }
+
+    private boolean individualCheck(Piece testPiece, Cell kingCell) {
+        ArrayList<Cell> pieceMoves = getUncheckedMoves(testPiece);
+        for (Cell testCell : pieceMoves) {
+            if (testCell.compare(kingCell)) return true;
+        }
+        return false;
     }
 
     @Override
