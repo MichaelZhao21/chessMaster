@@ -1,5 +1,7 @@
 package game;
 
+import java.util.ArrayList;
+
 enum PieceType {KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN, NONE, EMPTY}
 
 public class Piece {
@@ -7,6 +9,7 @@ public class Piece {
     public PieceType type;
     public boolean white;
     public Cell cell;
+    public ArrayList<Cell> moves = new ArrayList<>();
 
     public Piece(PieceType type, boolean white, Cell cell) {
         this.type = type;
@@ -23,6 +26,13 @@ public class Piece {
     public void print() {
         System.out.println(String.format(
                 "PIECE | %s %s -> %c%d", (white ? "White" : "Black"), type, cell.col, cell.row));
+    }
+
+    public void printMoves() {
+        print();
+        for (Cell c : moves) {
+            c.print();
+        }
     }
 
 }

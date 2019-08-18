@@ -22,7 +22,8 @@ public class Display extends JPanel {
         drawBoard(g2);
         drawLetters(g2);
         drawPieces(g2);
-        if (game.highlighted) drawHighlights(g2);
+        if (game.state == GameState.HIGHLIGHTED) drawHighlights(g2);
+        if (game.state == GameState.MOVED) drawScore(g2);
     }
 
     private void drawBoard(Graphics2D g) {
@@ -43,6 +44,20 @@ public class Display extends JPanel {
 
                 g.fillRect(SQUARE * (r + 1), SQUARE * (c + 1), SQUARE, SQUARE);
             }
+        }
+    }
+
+    private void drawLetters(Graphics2D g) {
+        g.setColor(Color.WHITE);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setFont(new Font("Serif", Font.PLAIN, 25));
+        FontMetrics fm = g.getFontMetrics();
+        for (int i = 0; i < 8; i++) {
+            String text = Function.getStringCharForNumber(8 - i);
+            int xOffset = -(fm.stringWidth(text) / 2);
+            int yOffset = fm.getAscent() - (fm.getHeight() / 2);
+            g.drawString(text, (90 + (SQUARE * (7 - i))) + xOffset, 45 + yOffset);
+            g.drawString(Integer.toString(i + 1), 45 + xOffset, (90 + (SQUARE * (7 - i))) + yOffset);
         }
     }
 
@@ -70,7 +85,7 @@ public class Display extends JPanel {
         int x = clickedPiece.cell.getX();
         int y = clickedPiece.cell.getY();
         drawSingleGradient(g, true, x, y);
-        for (Cell cell : game.possibleMoves) {
+        for (Cell cell : game.highlightedPiece.moves) {
             drawSingleGradient(g, false, cell.getX(), cell.getY());
         }
     }
@@ -96,18 +111,8 @@ public class Display extends JPanel {
         g.fillRect(x, y, 60, 60);
     }
 
-    private void drawLetters(Graphics2D g) {
-        g.setColor(Color.WHITE);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setFont(new Font("Serif", Font.PLAIN, 25));
-        FontMetrics fm = g.getFontMetrics();
-        for (int i = 0; i < 8; i++) {
-            String text = Function.getStringCharForNumber(8 - i);
-            int xOffset = -(fm.stringWidth(text) / 2);
-            int yOffset = fm.getAscent() - (fm.getHeight() / 2);
-            g.drawString(text, (90 + (SQUARE * (7 - i))) + xOffset, 45 + yOffset);
-            g.drawString(Integer.toString(i + 1), 45 + xOffset, (90 + (SQUARE * (7 - i))) + yOffset);
-        }
+    private void drawScore(Graphics2D g) {
+        System.out.println(game.score);
     }
 
     private void createFrame() {
