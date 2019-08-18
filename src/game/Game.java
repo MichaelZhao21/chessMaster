@@ -2,6 +2,9 @@ package game;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 enum NotationException {NONE, CAPTURE, EN_PASSANT, CHECKMATE, DRAW}
@@ -11,6 +14,7 @@ public class Game implements MouseListener {
 
     private final int SQUARE = 60;
     private final int[][] UNIT_DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    private final String BOARD_NAME = "checkmateTest";
     private boolean whiteTurn = true;
     private Display display;
     ArrayList<Piece> pieces = new ArrayList<>();
@@ -26,36 +30,36 @@ public class Game implements MouseListener {
     }
 
     private void makePieces() {
-        pieces.add(new Piece(PieceType.KING, true, new Cell('e', 1)));
-        pieces.add(new Piece(PieceType.PAWN, true, new Cell('d', 1)));
-        pieces.add(new Piece(PieceType.PAWN, true, new Cell('d', 2)));
-        pieces.add(new Piece(PieceType.PAWN, true, new Cell('f', 1)));
-        pieces.add(new Piece(PieceType.PAWN, true, new Cell('f', 2)));
-        pieces.add(new Piece(PieceType.PAWN, true, new Cell('a', 1)));
-        pieces.add(new Piece(PieceType.KING, false, new Cell('a', 8)));
-        pieces.add(new Piece(PieceType.QUEEN, false, new Cell('a', 4)));
+        try {
+            BufferedReader reader = new BufferedReader(
+                    new FileReader(new File("resources/boards/" + BOARD_NAME + ".txt")));
+            String line;
+            int row = 0;
+            while ((line = reader.readLine()) != null) {
+                row++;
+                processRow(line, row);
+            }
+            reader.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-//        pieces.add(new Piece(PieceType.KING, true, new Cell('e', 1)));
-//        pieces.add(new Piece(PieceType.QUEEN, true, new Cell('d', 1)));
-//        pieces.add(new Piece(PieceType.BISHOP, true, new Cell('c', 1)));
-//        pieces.add(new Piece(PieceType.BISHOP, true, new Cell('f', 1)));
-//        pieces.add(new Piece(PieceType.KNIGHT, true, new Cell('b', 1)));
-//        pieces.add(new Piece(PieceType.KNIGHT, true, new Cell('g', 1)));
-//        pieces.add(new Piece(PieceType.ROOK, true, new Cell('a', 1)));
-//        pieces.add(new Piece(PieceType.ROOK, true, new Cell('h', 1)));
-//        pieces.add(new Piece(PieceType.KING, false, new Cell('e', 8)));
-//        pieces.add(new Piece(PieceType.QUEEN, false, new Cell('d', 8)));
-//        pieces.add(new Piece(PieceType.BISHOP, false, new Cell('c', 8)));
-//        pieces.add(new Piece(PieceType.BISHOP, false, new Cell('f', 8)));
-//        pieces.add(new Piece(PieceType.KNIGHT, false, new Cell('b', 8)));
-//        pieces.add(new Piece(PieceType.KNIGHT, false, new Cell('g', 8)));
-//        pieces.add(new Piece(PieceType.ROOK, false, new Cell('a', 8)));
-//        pieces.add(new Piece(PieceType.ROOK, false, new Cell('h', 8)));
-//        for (int i = 0; i < 8; i++) {
-//            char col = Function.getCharForNumber(i + 1);
-//            pieces.add(new Piece(PieceType.PAWN, true, new Cell(col, 2)));
-//            pieces.add(new Piece(PieceType.PAWN, false, new Cell(col, 7)));
-//        }
+    private void processRow(String line, int row) {
+        boolean white;
+        PieceType pieceType;
+        int col = 0;
+        while (line.length() > 0) {
+            col++;
+            if (!line.substring(0, 1).equals("0")) {
+                white = line.substring(0, 1).equals("W");
+                pieceType = Function.letterToPieceType(line.substring(1, 2));
+                pieces.add(new Piece(pieceType, white, new Cell(Function.getCharForNumber(col), 9 - row)));
+
+            }
+            line = line.substring(2);
+        }
     }
 
     private void pickPiece(MouseEvent e) {
@@ -379,11 +383,12 @@ public class Game implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (state == GameState.HIGHLIGHTED) {
-            movePiece(e);
-        }
-        else {
-            pickPiece(e);
+        if (state != GameState.END) {
+            if (state == GameState.HIGHLIGHTED) {
+                movePiece(e);
+            } else {
+                pickPiece(e);
+            }
         }
     }
 

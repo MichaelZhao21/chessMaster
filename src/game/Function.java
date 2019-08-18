@@ -30,4 +30,20 @@ public class Function {
         return "P";
     }
 
+    public static PieceType letterToPieceType(String letter) {
+        switch (letter) {
+            case "K":
+                return PieceType.KING;
+            case "Q":
+                return PieceType.QUEEN;
+            case "B":
+                return PieceType.BISHOP;
+            case "N":
+                return PieceType.KNIGHT;
+            case "R":
+                return PieceType.ROOK;
+        }
+        return PieceType.PAWN;
+    }
+
 }
