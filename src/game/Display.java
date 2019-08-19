@@ -22,8 +22,8 @@ public class Display extends JPanel {
         drawBoard(g2);
         drawLetters(g2);
         drawPieces(g2);
+        drawScore(g2);
         if (game.state == GameState.HIGHLIGHTED) drawHighlights(g2);
-        if (game.state == GameState.MOVED) drawScore(g2);
     }
 
     private void drawBoard(Graphics2D g) {
@@ -112,6 +112,29 @@ public class Display extends JPanel {
     }
 
     private void drawScore(Graphics2D g) {
+        boolean white = true;
+        int row = 0;
+        int col = -1;
+        String line = "";
+
+        g.setFont(new Font("Serif", Font.PLAIN, 20));
+        g.setColor(Color.BLACK);
+
+        for (NotationObject nextMove : game.score) {
+            if (white) {
+                if (row % 21 == 0) {
+                    col++;
+                    row = 0;
+                }
+                row++;
+                line = (row + (21 * col)) + ". " + nextMove.getString();
+            }
+            else {
+                line += " " + nextMove.getString();
+            }
+            g.drawString(line, 600 + (180 * col), (25 * row) + 30);
+            white = !white;
+        }
     }
 
     private void createFrame() {

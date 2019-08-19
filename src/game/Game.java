@@ -352,6 +352,7 @@ public class Game implements MouseListener {
         return check;
     }
 
+    //TODO: King can eat INTO Check -- NO
     private boolean checkCheck(boolean white) {
         Cell kingCell = getKing(white).cell;
         if (kingCell != null) {
@@ -367,7 +368,6 @@ public class Game implements MouseListener {
         return false;
     }
 
-    //TODO: WHY IS IT BROKEN AGAINNNNNNN UGHHHHH
     private Piece checkMateCheck() {
         Piece king = getKing(whiteTurn);
         if (checkCheck(whiteTurn)) {
