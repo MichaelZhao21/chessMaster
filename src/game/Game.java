@@ -7,21 +7,20 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 
-enum NotationException {NONE, CAPTURE, EN_PASSANT, CHECKMATE, DRAW}
 enum GameState {NONE, HIGHLIGHTED, MOVED, END}
 
 public class Game implements MouseListener {
 
     private final int SQUARE = 60;
     private final int[][] UNIT_DIRECTIONS = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-    private final String BOARD_NAME = "checkmateTest";
+    private final String BOARD_NAME = "default";
     private boolean whiteTurn = true;
     private Display display;
     ArrayList<Piece> pieces = new ArrayList<>();
-    ArrayList<String> score = new ArrayList<>();
+    ArrayList<NotationObject> score = new ArrayList<>();
     GameState state = GameState.NONE;
     Piece highlightedPiece;
-    int turn = 0;
+    NotationObject moveNotation;
 
     public Game(Display display) {
         this.display = display;
@@ -54,8 +53,8 @@ public class Game implements MouseListener {
             col++;
             if (!line.substring(0, 1).equals("0")) {
                 white = line.substring(0, 1).equals("W");
-                pieceType = Function.letterToPieceType(line.substring(1, 2));
-                pieces.add(new Piece(pieceType, white, new Cell(Function.getCharForNumber(col), 9 - row)));
+                pieceType = letterToPieceType(line.substring(1, 2));
+                pieces.add(new Piece(pieceType, white, new Cell(getCharForNumber(col), 9 - row)));
 
             }
             line = line.substring(2);
@@ -77,7 +76,7 @@ public class Game implements MouseListener {
     }
 
     private Cell getCellClicked(int x, int y) {
-        return new Cell(Function.getCharForNumber(x / SQUARE), 9 - (y / SQUARE));
+        return new Cell(getCharForNumber(x / SQUARE), 9 - (y / SQUARE));
     }
 
     private Piece getClickedPiece(Cell c) {
@@ -93,6 +92,7 @@ public class Game implements MouseListener {
         state = GameState.NONE;
         int x = e.getX();
         int y = e.getY();
+        moveNotation = new NotationObject(pieces, highlightedPiece);
         Cell clickedCell = getCellClicked(x, y);
 
         for (Cell nextMove : highlightedPiece.moves) {
@@ -100,55 +100,64 @@ public class Game implements MouseListener {
                 Piece p = getOverlapPiece(clickedCell);
                 if (p.type != PieceType.EMPTY) {
                     pieces.remove(p);
-                    notate(highlightedPiece, clickedCell, NotationException.CAPTURE, p);
+                    moveNotation.extraNotationList.add(SpecialNotation.CAPTURE);
                 }
-                else {
-                    notate(highlightedPiece, clickedCell, NotationException.NONE, new Piece(PieceType.NONE));
-                }
-                highlightedPiece.cell = clickedCell;
+                moveNotation.moveTo = nextMove;
                 state = GameState.MOVED;
-                whiteTurn = !whiteTurn;
             }
         }
 
         if (state == GameState.MOVED) {
-            Piece checkPiece = checkMateCheck();
+            if (enPassantCheck(highlightedPiece.cell, clickedCell)) {
+                Piece p = getOverlapPiece(new Cell(
+                        clickedCell.col,
+                        clickedCell.row + (highlightedPiece.white ? -1 : 1)));
+                pieces.remove(p);
+                moveNotation.extraNotationList.add(SpecialNotation.EN_PASSANT);
+                moveNotation.extraNotationList.add(SpecialNotation.CAPTURE);
+            }
+            highlightedPiece.cell = clickedCell;
+            whiteTurn = !whiteTurn;
+            if (checkMateCheck().type != PieceType.NONE) {
+                state = GameState.END;
+                moveNotation.extraNotationList.add(SpecialNotation.CHECKMATE);
+            }
+            else if (drawCheck()) {
+                moveNotation.extraNotationList.add(SpecialNotation.DRAW);
+            }
+            score.add(moveNotation);
+            System.out.println(moveNotation.getString());
             writeMoves();
-            if (checkPiece.type != PieceType.NONE)
-                endGame(NotationException.CHECKMATE, checkPiece);
-            else if (drawCheck())
-                endGame(NotationException.DRAW, new Piece(PieceType.NONE));
         }
         else {
             pickPiece(e);
         }
 
+        if (state == GameState.END) endGame();
+
         display.repaint();
     }
 
-    private void endGame(NotationException e, Piece extra) {
+    private boolean enPassantCheck(Cell originalPos, Cell eatPos) {
+        if (score.size() == 0) return false;
+        NotationObject previousMove = score.get(score.size() - 1);
+        if (previousMove.type == PieceType.PAWN &&
+                previousMove.oldCell.row == (previousMove.white ? 2 : 7) &&
+                previousMove.moveTo.row == originalPos.row &&
+                previousMove.moveTo.col != originalPos.col &&
+                previousMove.moveTo.col == eatPos.col)
+            return true;
+        return false;
+    }
+
+    private void endGame() {
         state = GameState.END;
-        if (e == NotationException.CHECKMATE) {
-            System.out.println((extra.white ? "black" : "white") + " wins!");
+        if (moveNotation.extraNotationList.indexOf(SpecialNotation.CHECKMATE) != -1) {
+            System.out.println((moveNotation.white ? "white" : "black") + " wins!");
         }
         else {
             System.out.println("Draw");
         }
-    }
-
-    private void notate(Piece piece, Cell moveTo, NotationException exception, Piece args) {
-        String pieceLetter = Function.pieceTypeToLetter(piece.type);
-        String moveString = Character.toString(moveTo.col) + moveTo.row;
-        String note = "";
-        if (exception == NotationException.NONE)
-            note = (pieceLetter.equals("P") ? "" : pieceLetter) + moveString;
-
-        addToScore(note);
-    }
-
-    private void addToScore(String nextNote) {
-        if (whiteTurn) score.add(++turn + ". ");
-        score.add(nextNote);
     }
 
     private void highlight(Piece piece) {
@@ -224,14 +233,16 @@ public class Game implements MouseListener {
             }
         }
 
-        // Capture
+        // Capturing
         Cell captureLeft = new Cell(piece.cell.getAddedColChar(piece.white ? 1 : -1),
                 piece.cell.row + (piece.white ? 1 : -1));
         Cell captureRight = new Cell(piece.cell.getAddedColChar(piece.white ? -1 : 1),
                 piece.cell.row + (piece.white ? 1 : -1));
-        if (captureCheck(captureLeft, piece)) output.add(captureLeft);
-        if (captureCheck(captureRight, piece)) output.add(captureRight);
-        // TODO: Add En passant rules (get the previous move)
+        if (captureCheck(captureLeft, piece) || enPassantCheck(piece.cell, captureLeft))
+            output.add(captureLeft);
+        if (captureCheck(captureRight, piece) || enPassantCheck(piece.cell, captureRight))
+            output.add(captureRight);
+
         return output;
     }
 
@@ -318,8 +329,8 @@ public class Game implements MouseListener {
         }
         if (cell.row < 1 ||
                 cell.row > 8 ||
-                Function.charLetterToInt(cell.col) < 1 ||
-                Function.charLetterToInt(cell.col) > 8) {
+                charLetterToInt(cell.col) < 1 ||
+                charLetterToInt(cell.col) > 8) {
             return new Piece(PieceType.NONE);
         } else {
             return new Piece(PieceType.EMPTY);
@@ -330,12 +341,12 @@ public class Game implements MouseListener {
         Cell oldLocation = piece.cell;
         Piece eatenPiece = getOverlapPiece(newLocation);
 
-        if (eatenPiece.type != PieceType.EMPTY) pieces.remove(eatenPiece);
+        if (eatenPiece.type != PieceType.EMPTY) eatenPiece.tempDelete = true;
         piece.cell = newLocation;
 
         boolean check = checkCheck(piece.white);
 
-        if (eatenPiece.type != PieceType.EMPTY) pieces.add(eatenPiece);
+        if (eatenPiece.type != PieceType.EMPTY) eatenPiece.tempDelete = false;
         piece.cell = oldLocation;
 
         return check;
@@ -345,7 +356,7 @@ public class Game implements MouseListener {
         Cell kingCell = getKing(white).cell;
         if (kingCell != null) {
             for (Piece piece : pieces) {
-                if (piece.white != white) {
+                if (piece.white != white && !piece.tempDelete) {
                     ArrayList<Cell> pieceMoves = getUncheckedMoves(piece);
                     for (Cell testCell : pieceMoves) {
                         if (testCell.compare(kingCell)) return true;
@@ -356,12 +367,14 @@ public class Game implements MouseListener {
         return false;
     }
 
+    //TODO: WHY IS IT BROKEN AGAINNNNNNN UGHHHHH
     private Piece checkMateCheck() {
         Piece king = getKing(whiteTurn);
         if (checkCheck(whiteTurn)) {
-            ArrayList<Cell> possibleKingMoves = getPossibleMoves(king);
-            for (Cell c : possibleKingMoves) {
-                if (!checkCheck(king, c)) return new Piece(PieceType.NONE);
+            for (Piece piece : pieces) {
+                for (Cell c : piece.moves) {
+                    if (!checkCheck(king, c)) return new Piece(PieceType.NONE);
+                }
             }
             return king;
         }
@@ -403,4 +416,49 @@ public class Game implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {}
+
+    public static String getStringCharForNumber(int i) {
+        return String.valueOf(getCharForNumber(i));
+    }
+
+    public static char getCharForNumber(int i) {
+        return (char)(i + 96);
+    }
+
+    public static int charLetterToInt(char c) {
+        return Character.getNumericValue(c) - 9;
+    }
+
+    public static String pieceTypeToLetter(PieceType type) {
+        switch (type) {
+            case KING:
+                return "K";
+            case QUEEN:
+                return "Q";
+            case BISHOP:
+                return "B";
+            case KNIGHT:
+                return "N";
+            case ROOK:
+                return "R";
+        }
+        return "P";
+    }
+
+    public static PieceType letterToPieceType(String letter) {
+        switch (letter) {
+            case "K":
+                return PieceType.KING;
+            case "Q":
+                return PieceType.QUEEN;
+            case "B":
+                return PieceType.BISHOP;
+            case "N":
+                return PieceType.KNIGHT;
+            case "R":
+                return PieceType.ROOK;
+        }
+        return PieceType.PAWN;
+    }
+
 }

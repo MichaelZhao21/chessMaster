@@ -10,6 +10,7 @@ public class Piece {
     public boolean white;
     public Cell cell;
     public ArrayList<Cell> moves = new ArrayList<>();
+    public boolean tempDelete = false;
 
     public Piece(PieceType type, boolean white, Cell cell) {
         this.type = type;

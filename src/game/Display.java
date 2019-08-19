@@ -53,7 +53,7 @@ public class Display extends JPanel {
         g.setFont(new Font("Serif", Font.PLAIN, 25));
         FontMetrics fm = g.getFontMetrics();
         for (int i = 0; i < 8; i++) {
-            String text = Function.getStringCharForNumber(8 - i);
+            String text = Game.getStringCharForNumber(8 - i);
             int xOffset = -(fm.stringWidth(text) / 2);
             int yOffset = fm.getAscent() - (fm.getHeight() / 2);
             g.drawString(text, (90 + (SQUARE * (7 - i))) + xOffset, 45 + yOffset);
@@ -65,12 +65,12 @@ public class Display extends JPanel {
         for (int i = 0; i < game.pieces.size(); i++) {
             Piece tempPiece = game.pieces.get(i);
             String letter = tempPiece.white ? "W" : "B";
-            letter += Function.pieceTypeToLetter(tempPiece.type);
+            letter += Game.pieceTypeToLetter(tempPiece.type);
             BufferedImage img;
             try {
                 img = ImageIO.read(new File(PIECE_DIRECTORY + "/" + letter + ".png"));
                 g.drawImage(img,
-                        Function.charLetterToInt(tempPiece.cell.col) * SQUARE,
+                        Game.charLetterToInt(tempPiece.cell.col) * SQUARE,
                         (9 - tempPiece.cell.row) * SQUARE,
                         null);
             } catch (IOException e) {
@@ -112,7 +112,6 @@ public class Display extends JPanel {
     }
 
     private void drawScore(Graphics2D g) {
-        System.out.println(game.score);
     }
 
     private void createFrame() {

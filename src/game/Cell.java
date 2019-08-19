@@ -20,7 +20,7 @@ public class Cell {
     }
 
     public int getX() {
-        return Function.charLetterToInt(col) * 60;
+        return Game.charLetterToInt(col) * 60;
     }
 
     public int getY() {
@@ -28,7 +28,7 @@ public class Cell {
     }
 
     public char getAddedColChar(int change) {
-        return Function.getCharForNumber(Function.charLetterToInt(col) + change);
+        return Game.getCharForNumber(Game.charLetterToInt(col) + change);
     }
 
     public void print() {
